@@ -267,7 +267,7 @@
 
   <!-- Language selector -->
   <div class="lang-select">
-    <span class="lang-select-label">Jazyk vstupu</span>
+    <span class="lang-select-label" id="langSelectLabel">Jazyk vstupu</span>
     <button class="lang-btn" id="langBtn">CS → EN</button>
   </div>
 
@@ -294,25 +294,40 @@ let qualityMode        = false;   // false = latency_optimized, true = quality_o
 let currentAbortCtrl   = null;    // pro zrušení předchozího fetch
 let sourceLang         = 'CS';    // 'CS' nebo 'EN'
 
-const micBtn        = document.getElementById('micBtn');
-const micWrap       = document.getElementById('micWrap');
-const outputEl      = document.getElementById('outputText');
-const qualityToggle = document.getElementById('qualityToggle');
-const qualityLabel  = document.getElementById('qualityLabel');
-const langBtn       = document.getElementById('langBtn');
+const micBtn           = document.getElementById('micBtn');
+const micWrap          = document.getElementById('micWrap');
+const outputEl         = document.getElementById('outputText');
+const qualityToggle    = document.getElementById('qualityToggle');
+const qualityLabel     = document.getElementById('qualityLabel');
+const langBtn          = document.getElementById('langBtn');
+const langSelectLabel  = document.getElementById('langSelectLabel');
+
+// ─── i18n labels ─────────────────────────────────────────────────────────────
+const LABELS = {
+  CS: { langSelectLabel: 'Jazyk vstupu', speed: 'Rychlost', quality: 'Kvalita', placeholder: 'Zmáčkni mikrofon, mluv, zmáčkni znovu…' },
+  EN: { langSelectLabel: 'Input language', speed: 'Speed',   quality: 'Quality', placeholder: 'Press mic, speak, press again…' },
+};
+
+function updateLabels() {
+  const L = LABELS[sourceLang];
+  langSelectLabel.textContent = L.langSelectLabel;
+  qualityLabel.textContent    = qualityMode ? L.quality : L.speed;
+  if (outputEl.classList.contains('empty')) outputEl.textContent = L.placeholder;
+}
 
 // ─── Language selector ───────────────────────────────────────────────────────
 langBtn.addEventListener('click', () => {
   if (isListening) return; // nelze měnit za jízdy
   sourceLang = sourceLang === 'CS' ? 'EN' : 'CS';
   langBtn.textContent = sourceLang === 'CS' ? 'CS → EN' : 'EN → CS';
+  updateLabels();
 });
 
 // ─── Quality toggle ─────────────────────────────────────────────────────────
 qualityToggle.addEventListener('click', () => {
   qualityMode = !qualityMode;
   qualityToggle.classList.toggle('on', qualityMode);
-  qualityLabel.textContent = qualityMode ? 'Kvalita' : 'Rychlost';
+  updateLabels();
 });
 
 // ─── Dynamic font sizing ─────────────────────────────────────────────────────
